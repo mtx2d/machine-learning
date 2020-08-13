@@ -37,11 +37,12 @@ grad = zeros(size(theta));
 %
 
 
+reg_cost = lambda/(2 * m) * (theta' * theta - theta(1, 1) .^ 2);
+J = -1/m * (y' * log(sigmoid(X * theta)) + (1 - y')*log(1- sigmoid(X * theta))) + reg_cost;
 
-
-
-
-
+grad_0 = 1/m * (sigmoid(X * theta) - y)' * X(:, 1);
+grad_all = lambda/m * theta + 1/m * X' * (sigmoid(X * theta) - y);
+grad = [grad_0; grad_all(2:length(theta), :)];
 
 
 
