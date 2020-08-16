@@ -62,15 +62,21 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+for i=1:m,
+  example = X(i, :);
 
+  # forward propagation
+  z2 = [1, example] * Theta1'; # size = 1, hidden_layer_size
+  a2 = sigmoid(z2); # size = 1, hidden_layer_size + 1
 
-z2 = [ones(m, 1), X] * Theta1'; # size = m, hidden_layer_size
-a2 = sigmoid(z2); # size = m, hidden_layer_size + 1
-
-z3 = [ones(m, 1), a2] * Theta2'; # size = m, num_labels,
-a3 = sigmoid(z3);
-
-
+  z3 = [1, a2] * Theta2'; # size = 1, num_labels,
+  a3 = sigmoid(z3); # size = m, num_labels
+  
+  ground_truth_label = zeros(num_labels, 1);
+  ground_truth_label(y(i)) = 1;
+  
+  J = J + 1/m * (-log(a3) * ground_truth_label- log(1 - a3) * (1 - ground_truth_label));
+endfor
 
 % -------------------------------------------------------------
 
