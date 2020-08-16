@@ -63,22 +63,36 @@ Theta2_grad = zeros(size(Theta2));
 %
 
 for i=1:m,
-  example = X(i, :);
+  example = X(i, :); # size = 1, input_layer_size
 
   # forward propagation
   z2 = [1, example] * Theta1'; # size = 1, hidden_layer_size
   a2 = sigmoid(z2); # size = 1, hidden_layer_size + 1
 
   z3 = [1, a2] * Theta2'; # size = 1, num_labels,
-  a3 = sigmoid(z3); # size = m, num_labels
+  a3 = sigmoid(z3); # size = 1, num_labels
   
   ground_truth_label = zeros(num_labels, 1);
   ground_truth_label(y(i)) = 1;
   
   J = J + 1/m * (-log(a3) * ground_truth_label- log(1 - a3) * (1 - ground_truth_label));
+  
+  # back propagation
+  delta3 = a3 - ground_truth_label'; # size = 1, num_labels
+  delta2 = (delta3 * Theta2 .* sigmoidGradient([1 z2]))(:, 2:end); # size = 1, hidden_layer_size
+  
+  # partial derivatives
+  Theta1_grad = (Theta1_grad + delta2' * [1 example]);
+  Theta2_grad = (Theta2_grad + delta3' * [1 a2]);
 endfor
 
+regularization_cost = lambda/(2 * m) * (sum((Theta1(:, 2:end) .^ 2)(:)) + sum((Theta2(:, 2:end) .^ 2)(:)));
+J = J + regularization_cost;
+
+Theta1_grad = [Theta1_grad(:, 1)/m Theta1_grad(:, 2:end)/m + lambda/m*Theta1(:, 2:end)];
+Theta2_grad = [Theta2_grad(:, 1)/m Theta2_grad(:, 2:end)/m + lambda/m*Theta2(:, 2:end)];
 % -------------------------------------------------------------
+
 
 % =========================================================================
 
